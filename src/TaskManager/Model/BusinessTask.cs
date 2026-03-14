@@ -1,12 +1,35 @@
-﻿namespace TaskManager.Model;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-public class BusinessTask
+namespace TaskManager.Model;
+
+// Gosh i miss ReactiveUI
+public class BusinessTask : INotifyPropertyChanged
 {
     public Guid Id { get; } = Guid.NewGuid();
-    public required string Title { get; set; }
-    public string? Description { get; set; }
-    public Status Status { get; set; }
-    public Priority Priority { get; set; }
-    public DateTime? DueDate { get; set; }
+
+    private string _title;
+    public string Title { get => _title; set => SetValue(ref _title, value); }
+
+    private string? _description;
+    public string? Description { get => _description; set => SetValue(ref _description, value); }
+    
+    private Status _status;
+    public Status Status { get => _status; set => SetValue(ref _status, value); }
+
+    private Priority _priority;
+    public Priority Priority { get => _priority; set => SetValue(ref _priority, value); }
+
+    private DateTime? _dueDate;
+    public DateTime? DueDate { get => _dueDate; set => SetValue(ref _dueDate, value); }
+
     public DateTime CreatedAt { get; } = DateTime.UtcNow;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void SetValue<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
+    {
+        field = value;
+        PropertyChanged?.Invoke(this, new(propertyName));
+    }
 }
