@@ -7,57 +7,80 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:components="clr-namespace:TaskManager.Components"
         xmlns:utils="clr-namespace:TaskManager.Utils"
+        xmlns:vm="clr-namespace:TaskManager.ViewModels"
         mc:Ignorable="d"
         Title="TaskManager" Height="768" Width="1024"
         Style="{StaticResource MaterialDesignWindow}">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" MaxHeight="100"/>
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <DockPanel Margin="10" Grid.Row="0">
-            <ListBox DockPanel.Dock="Right"
+    <Window.DataContext>
+        <vm:TaskManagerVM/>
+    </Window.DataContext>
+    <Window.Resources>
+        <ResourceDictionary Source="/Components/DialogTemplates.xaml" />
+    </Window.Resources>
+    <materialDesign:DialogHost x:Name="RootDialogHost" Identifier="RootDialogHostId">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" MaxHeight="100"/>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <DockPanel Margin="10" Grid.Row="0">
+                <ListBox DockPanel.Dock="Right"
                      ItemsSource="{Binding Path=Statuses}"
                      SelectedItem="{Binding Path=StatusFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Center"/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
-                                    <RadioButton Content="{Binding Description}" Margin="5"
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Center"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <RadioButton Content="{Binding Description}" Margin="5"
                                      GroupName="StatusFilter"
                                      IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"/>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
-            <ComboBox materialDesign:HintAssist.Hint="Сортировка" Margin="5" VerticalAlignment="Center" DockPanel.Dock="Right"
-                                  ItemsSource="{Binding Path=Statuses}"
-                                  SelectedItem="{Binding Path=StatusFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <materialDesign:PackIcon Kind="Search" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="-25 0 0 0"/>
-            <TextBox Margin="5" VerticalAlignment="Center"
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+                <ComboBox materialDesign:HintAssist.Hint="Сортировка" DockPanel.Dock="Right"
+                                  ItemsSource="{Binding Path=SortType, Converter={utils:EnumToCollectionConverter}, Mode=OneTime}"
+                                  SelectedValuePath="Value"
+                                  DisplayMemberPath="Description"
+                                  SelectedValue="{Binding Path=SortType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                </ComboBox>
+                <materialDesign:PackIcon Kind="Search" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="-25 0 0 0"/>
+                <TextBox Margin="5" VerticalAlignment="Center"
                      Text="{Binding Path=SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged, Delay=200}"/>
-        </DockPanel>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding Path=TasksView}" VirtualizingPanel.IsVirtualizing="True">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <components:TaskCard Width="300" Margin="10"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-    </Grid>
+            </DockPanel>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding Path=TasksView}" VirtualizingPanel.IsVirtualizing="True">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <components:TaskCard Width="300" Margin="8"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <DockPanel Grid.Row="2" LastChildFill="False">
+                <Button Style="{DynamicResource MaterialDesignFloatingActionButton}" Margin="10" DockPanel.Dock="Left"
+                        Command="{Binding Path=SaveCommand}">
+                    <materialDesign:PackIcon Kind="ContentSave" />
+                </Button>
+                <Button Style="{DynamicResource MaterialDesignFloatingActionButton}" Margin="10" DockPanel.Dock="Right"
+                        Command="{Binding Path=CreateCommand}">
+                    <materialDesign:PackIcon Kind="Plus" />
+                </Button>
+            </DockPanel>
+        </Grid>
+    </materialDesign:DialogHost>
 </Window>
