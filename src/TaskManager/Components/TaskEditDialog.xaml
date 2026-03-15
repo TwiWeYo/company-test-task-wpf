@@ -9,7 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel DataContext="{Binding BusinessTask}" Margin="10">
         <TextBlock Text="Название" Margin="5" />
-        <TextBox Text="{Binding Path=Title, Mode=TwoWay}" Margin="5" />
+        <TextBox Name="textBoxTitle" Text="{Binding Path=Title, Mode=TwoWay, ValidatesOnDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=LostFocus}" Margin="5 15"/>
         <TextBlock Text="Описание" />
         <TextBox Text="{Binding Path=Description, Mode=TwoWay}" Margin="5" />
         <ComboBox md:HintAssist.Hint="Статус" Margin="5 10"
@@ -25,9 +25,16 @@
           SelectedValue="{Binding Path=Priority, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
         </ComboBox>
         <TextBlock Text="Срок выполнения" Margin="5" />
-        <DatePicker SelectedDate="{Binding Path=DueDate}" Margin="5" />
+        <DatePicker x:Name="datePickerDueDate" SelectedDate="{Binding Path=DueDate, ValidatesOnDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=LostFocus}" Margin="5" />
         <UniformGrid Columns="2" Margin="0 10">
-            <Button Content="Подтвердить" Command="{x:Static md:DialogHost.CloseDialogCommand}" CommandParameter="Confirm" Margin="5"/>
+            <Button Content="Подтвердить" Command="{x:Static md:DialogHost.CloseDialogCommand}" CommandParameter="Confirm" Margin="5">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{utils:InverseAndBooleansToBooleanConverter}" Mode="TwoWay">
+                        <Binding ElementName="textBoxTitle" Path="(Validation.HasError)" />
+                        <Binding ElementName="datePickerDueDate" Path="(Validation.HasError)" />
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
             <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Отмена" Command="{x:Static md:DialogHost.CloseDialogCommand}" CommandParameter="Cancel" Margin="5"/>
         </UniformGrid>
     </StackPanel>

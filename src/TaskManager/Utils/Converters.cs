@@ -93,3 +93,26 @@ public class PriorityToColorConverter : MarkupExtension, IValueConverter
 
     public override object ProvideValue(IServiceProvider serviceProvider) => this;
 }
+
+
+public class InverseAndBooleansToBooleanConverter : MarkupExtension, IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values.Length > 0)
+        {
+            foreach (var value in values)
+            {
+                if (value is bool && (bool)value)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => null;
+
+    public override object ProvideValue(IServiceProvider serviceProvider) => this;
+}
