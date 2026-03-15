@@ -4,10 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TaskManager"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:components="clr-namespace:TaskManager.Components"
+        xmlns:utils="clr-namespace:TaskManager.Utils"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="TaskManager" Height="768" Width="1024"
         Style="{StaticResource MaterialDesignWindow}">
+    <Window.Resources>
+        <utils:DateConverter x:Key="dateConverter"/>
+    </Window.Resources>
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" MaxHeight="100"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <DockPanel Margin="10" Grid.Row="0">
+            <ComboBox materialDesign:HintAssist.Hint="Статус" Margin="5" DockPanel.Dock="Right"
+                                  ItemsSource="{Binding Path=Statuses}"
+                                  SelectedItem="{Binding Path=FilterStatus, Mode=TwoWay}"/>
+            <ComboBox materialDesign:HintAssist.Hint="Сортировка" Margin="5" DockPanel.Dock="Right"
+                                  ItemsSource="{Binding Path=Statuses}"
+                                  SelectedItem="{Binding Path=FilterStatus, Mode=TwoWay}"/>
+            <materialDesign:PackIcon Kind="Search" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="-25 0 0 0"/>
+            <TextBox Margin="5"/>
+        </DockPanel>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Path=Tasks}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <components:TaskCard Width="300" Margin="10"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </Window>
