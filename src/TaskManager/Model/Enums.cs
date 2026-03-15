@@ -19,3 +19,15 @@ public enum Priority
     [Description("Высокий")]
     High
 }
+
+public enum SortType
+{
+    [Description("Нет")]
+    None,
+    [Description("По дате создания")]
+    ByCreatedAt,
+    [Description("По приоритету")]
+    ByPriority,
+    [Description("По сроку выполнения")]
+    ByDueDate
+}

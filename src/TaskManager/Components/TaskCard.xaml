@@ -27,10 +27,14 @@
                 <TextBlock Style="{DynamicResource MaterialDesignTitleMediumTextBlock}" VerticalAlignment="Bottom" Margin="5" TextWrapping="Wrap" Grid.Column="0"
                            Text="{Binding Path=Title}"
                            d:Text="Title"/>
-                <Button Style="{DynamicResource MaterialDesignToolForegroundButton}" Grid.Column="1">
+                <Button Style="{DynamicResource MaterialDesignToolForegroundButton}" Grid.Column="1" 
+                        Command="{Binding Path=DataContext.UpdateCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                        CommandParameter="{Binding}">
                     <materialDesign:PackIcon Kind="Pencil" Foreground="{DynamicResource MaterialDesign.Brush.Primary}"/>
                 </Button>
-                <Button Style="{DynamicResource MaterialDesignToolForegroundButton}" Grid.Column="2">
+                <Button Style="{DynamicResource MaterialDesignToolForegroundButton}" Grid.Column="2"
+                        Command="{Binding Path=DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                        CommandParameter="{Binding}">
                     <materialDesign:PackIcon Kind="Delete" Foreground="Red"/>
                 </Button>
             </Grid>
@@ -38,9 +42,10 @@
                 <DockPanel x:Name="Body" LastChildFill="True">
                     <DockPanel DockPanel.Dock="Bottom">
 
-                        <Border Background="{DynamicResource MaterialDesign.Brush.Primary}"  Margin="10" Padding="5" DockPanel.Dock="Right">
+                        <Border Background="{Binding Path=Priority, Converter={utils:PriorityToColorConverter}}" Margin="10" Padding="5" DockPanel.Dock="Right">
                             <Label VerticalAlignment="Center"
-                                   Content="{Binding Path=Priority}"
+                                   Foreground="{DynamicResource MaterialDesign.Brush.Primary.Foreground}"
+                                   Content="{Binding Path=Priority, Converter={utils:EnumToDescriptionConverter}}"
                                     d:Content="Low"/>
                         </Border>
                         <ComboBox materialDesign:HintAssist.Hint="Статус"
@@ -58,12 +63,13 @@
             </Border>
             <DockPanel Grid.Row="2">
                 <TextBlock Margin="5" FontSize="10" DockPanel.Dock="Left"
-                           Text="{Binding Path=CreatedAt, StringFormat='Создано: {0}', Converter={utils:DateConverter}}"
+                           Text="{Binding Path=CreatedAt, StringFormat='Создано: {0}', Converter={utils:DateToFormattedStringConverter}}"
                            d:Text="Создано: 14.03.2026"/>
                 <TextBlock Margin="5" TextAlignment="Right" FontSize="10" DockPanel.Dock="Right"
-                           Text="{Binding Path=DueDate, StringFormat='Срок до: {0}', Converter={utils:DateConverter}}"
+                           Text="{Binding Path=DueDate, StringFormat='Срок до: {0}', Converter={utils:DateToFormattedStringConverter}}"
                            d:Text="Срок до: 17.03.2026"/>
-                <materialDesign:PackIcon Kind="Warning" Foreground="DarkOrange" VerticalAlignment="Center" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                <materialDesign:PackIcon Kind="Warning" Foreground="DarkOrange" VerticalAlignment="Center" HorizontalAlignment="Right" DockPanel.Dock="Right"
+                                         Visibility="{Binding Path=DueDate, Converter={utils:DateToVisibilityConverter}}"/>
             </DockPanel>
         </Grid>
     </materialDesign:Card>

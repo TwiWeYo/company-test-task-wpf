@@ -6,7 +6,7 @@ namespace TaskManager.Model;
 // Gosh i miss ReactiveUI
 public class BusinessTask : INotifyPropertyChanged
 {
-    public Guid Id { get; } = Guid.NewGuid();
+    public Guid Id { get; init; } = Guid.NewGuid();
 
     private string _title;
     public string Title { get => _title; set => SetValue(ref _title, value); }
@@ -23,7 +23,7 @@ public class BusinessTask : INotifyPropertyChanged
     private DateTime? _dueDate;
     public DateTime? DueDate { get => _dueDate; set => SetValue(ref _dueDate, value); }
 
-    public DateTime CreatedAt { get; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
