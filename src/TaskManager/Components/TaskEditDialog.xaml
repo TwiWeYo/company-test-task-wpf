@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="TaskManager.Components.TaskEditDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TaskManager.Components"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:utils="clr-namespace:TaskManager.Utils"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel DataContext="{Binding BusinessTask}" Margin="10">
+        <TextBlock Text="Название" Margin="5" />
+        <TextBox Text="{Binding Path=Title, Mode=TwoWay}" Margin="5" />
+        <TextBlock Text="Описание" />
+        <TextBox Text="{Binding Path=Description, Mode=TwoWay}" Margin="5" />
+        <ComboBox md:HintAssist.Hint="Статус" Margin="5 10"
+          ItemsSource="{Binding Path=Status, Converter={utils:EnumToCollectionConverter}, Mode=OneTime}"
+          SelectedValuePath="Value"
+          DisplayMemberPath="Description"
+          SelectedValue="{Binding Path=Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        </ComboBox>
+        <ComboBox md:HintAssist.Hint="Приоритет" Margin="5 10"
+          ItemsSource="{Binding Path=Priority, Converter={utils:EnumToCollectionConverter}, Mode=OneTime}"
+          SelectedValuePath="Value"
+          DisplayMemberPath="Description"
+          SelectedValue="{Binding Path=Priority, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        </ComboBox>
+        <TextBlock Text="Срок выполнения" Margin="5" />
+        <DatePicker SelectedDate="{Binding Path=DueDate}" Margin="5" />
+        <UniformGrid Columns="2" Margin="0 10">
+            <Button Content="Подтвердить" Command="{x:Static md:DialogHost.CloseDialogCommand}" CommandParameter="Confirm" Margin="5"/>
+            <Button Style="{DynamicResource MaterialDesignFlatButton}" Content="Отмена" Command="{x:Static md:DialogHost.CloseDialogCommand}" CommandParameter="Cancel" Margin="5"/>
+        </UniformGrid>
+    </StackPanel>
+</UserControl>
