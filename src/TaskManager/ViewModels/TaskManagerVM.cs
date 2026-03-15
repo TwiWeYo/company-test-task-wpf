@@ -1,10 +1,8 @@
 ﻿using MaterialDesignThemes.Wpf;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
 using System.Text.Json;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using TaskManager.Config;
@@ -24,14 +22,14 @@ public class TaskManagerVM : ViewModel
     public ObservableCollection<ValueDescription> Statuses { get; }
 
     private string _searchText;
-    public string SearchText 
-    { 
+    public string SearchText
+    {
         get => _searchText;
-        set 
+        set
         {
             SetValue(ref _searchText, value);
             TasksView?.Refresh();
-        } 
+        }
     }
 
     private ValueDescription _statusFilter;
@@ -69,7 +67,7 @@ public class TaskManagerVM : ViewModel
 
         Statuses = new(EnumHelper
             .GetAllValuesAndDescriptions(typeof(Status))
-            .Prepend(new() { Value = null, Description = "Все"}));
+            .Prepend(new() { Value = null, Description = "Все" }));
 
         _tasks = new();
         TasksView = CollectionViewSource.GetDefaultView(_tasks);
@@ -100,8 +98,8 @@ public class TaskManagerVM : ViewModel
     {
         var newTask = new BusinessTask();
         var vm = new TaskEditDialogVM() { BusinessTask = newTask };
-     
-        await ShowDialog(vm, () => _tasks.Add(newTask));   
+
+        await ShowDialog(vm, () => _tasks.Add(newTask));
     }
 
     private async void OnUpdateCommand(object? taskObj)
@@ -137,7 +135,7 @@ public class TaskManagerVM : ViewModel
             return;
 
         var vm = new ConfirmDialogVM() { Message = "Вы уверены, что хотите удалить эту задачу?" };
-        
+
         await ShowDialog(vm, () => _tasks.Remove(task));
     }
 

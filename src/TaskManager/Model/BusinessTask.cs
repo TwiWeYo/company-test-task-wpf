@@ -14,7 +14,7 @@ public class BusinessTask : INotifyPropertyChanged, IDataErrorInfo
 
     private string? _description;
     public string? Description { get => _description; set => SetValue(ref _description, value); }
-    
+
     private Status _status;
     public Status Status { get => _status; set => SetValue(ref _status, value); }
 
