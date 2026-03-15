@@ -10,26 +10,43 @@
         mc:Ignorable="d"
         Title="TaskManager" Height="768" Width="1024"
         Style="{StaticResource MaterialDesignWindow}">
-    <Window.Resources>
-        <utils:DateConverter x:Key="dateConverter"/>
-    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" MaxHeight="100"/>
             <RowDefinition />
         </Grid.RowDefinitions>
         <DockPanel Margin="10" Grid.Row="0">
-            <ComboBox materialDesign:HintAssist.Hint="Статус" Margin="5" DockPanel.Dock="Right"
+            <ListBox DockPanel.Dock="Right"
+                     ItemsSource="{Binding Path=Statuses}"
+                     SelectedItem="{Binding Path=StatusFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <RadioButton Content="{Binding Description}" Margin="5"
+                                     GroupName="StatusFilter"
+                                     IsChecked="{Binding IsSelected, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+            <ComboBox materialDesign:HintAssist.Hint="Сортировка" Margin="5" VerticalAlignment="Center" DockPanel.Dock="Right"
                                   ItemsSource="{Binding Path=Statuses}"
-                                  SelectedItem="{Binding Path=FilterStatus, Mode=TwoWay}"/>
-            <ComboBox materialDesign:HintAssist.Hint="Сортировка" Margin="5" DockPanel.Dock="Right"
-                                  ItemsSource="{Binding Path=Statuses}"
-                                  SelectedItem="{Binding Path=FilterStatus, Mode=TwoWay}"/>
+                                  SelectedItem="{Binding Path=StatusFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <materialDesign:PackIcon Kind="Search" VerticalAlignment="Center" DockPanel.Dock="Right" Margin="-25 0 0 0"/>
-            <TextBox Margin="5"/>
+            <TextBox Margin="5" VerticalAlignment="Center"
+                     Text="{Binding Path=SearchText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged, Delay=200}"/>
         </DockPanel>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"  Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding Path=Tasks}">
+            <ItemsControl ItemsSource="{Binding Path=TasksView}" VirtualizingPanel.IsVirtualizing="True">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel/>
