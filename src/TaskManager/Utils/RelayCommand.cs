@@ -16,4 +16,9 @@ public class RelayCommand(Action<object?> execute, Func<object?, bool> canExecut
     {
         execute?.Invoke(parameter);
     }
+
+    public void RaiseCanExecuteChanged()
+    {
+        CanExecuteChanged?.Invoke(this, new EventArgs());
+    }
 }

@@ -8,6 +8,7 @@
         xmlns:components="clr-namespace:TaskManager.Components"
         xmlns:utils="clr-namespace:TaskManager.Utils"
         xmlns:vm="clr-namespace:TaskManager.ViewModels"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="TaskManager" Height="768" Width="1024"
         Style="{StaticResource MaterialDesignWindow}">
@@ -17,6 +18,11 @@
     <Window.Resources>
         <ResourceDictionary Source="/Components/DialogTemplates.xaml" />
     </Window.Resources>
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding LoadCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
     <materialDesign:DialogHost x:Name="RootDialogHost" Identifier="RootDialogHostId">
         <Grid Margin="10">
             <Grid.RowDefinitions>

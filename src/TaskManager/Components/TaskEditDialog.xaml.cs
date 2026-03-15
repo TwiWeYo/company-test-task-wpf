@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace TaskManager.Components
+namespace TaskManager.Components;
+
+/// <summary>
+/// Логика взаимодействия для TaskEditDialog.xaml
+/// </summary>
+public partial class TaskEditDialog : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для TaskEditDialog.xaml
-    /// </summary>
-    public partial class TaskEditDialog : UserControl
+    public TaskEditDialog()
     {
-        public TaskEditDialog()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

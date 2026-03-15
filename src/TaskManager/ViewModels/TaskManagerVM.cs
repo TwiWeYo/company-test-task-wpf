@@ -1,8 +1,13 @@
 ﻿using MaterialDesignThemes.Wpf;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
+using System.IO;
+using System.Text.Json;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using TaskManager.Config;
 using TaskManager.Model;
 using TaskManager.Utils;
 
@@ -11,6 +16,7 @@ public class TaskManagerVM : ViewModel
 {
     private const string DialogHostId = "RootDialogHostId";
 
+    private readonly string _filePath;
 
     private ObservableCollection<BusinessTask> _tasks;
     public ICollectionView TasksView { get; }
@@ -54,25 +60,18 @@ public class TaskManagerVM : ViewModel
     public ICommand CreateCommand { get; }
     public ICommand UpdateCommand { get; }
     public ICommand DeleteCommand { get; }
-    public ICommand SaveCommand { get; }
+    public ICommand LoadCommand { get; }
+    public RelayCommand SaveCommand { get; }
 
     public TaskManagerVM()
     {
-        _tasks = new()
-        {
-            new BusinessTask { Title = "Тест", Description = "Посмотреть как оно будет выглядеть", DueDate = DateTime.Now, Priority = Priority.High, Status = Status.Active },
-            new BusinessTask { Title = "Тест", Description = "Посмотреть как оно будет выглядеть", DueDate = DateTime.Now, Priority = Priority.High, Status = Status.Completed},
-            new BusinessTask { Title = "Тест", Description = "Посмотреть как оно будет выглядеть", DueDate = DateTime.Now, Priority = Priority.Medium, Status = Status.Active },
-            new BusinessTask { Title = "Тест", Description = "Посмотреть как оно будет выглядеть", DueDate = DateTime.Now, Priority = Priority.Low, Status = Status.Active },
-            new BusinessTask { Title = "Тест", Description = "Посмотреть как оно будет выглядеть \n с очень длинным текстом. Заодно проверим враппинг, вдруг чего не то", DueDate = DateTime.Now, Priority = Priority.High, Status = Status.Active },
-            new BusinessTask { Title = "Тест", Description = "Посмотреть как оно будет выглядеть", DueDate = DateTime.Now.AddDays(-5), Priority = Priority.High, Status = Status.Active },
-            new BusinessTask { Title = "Тест", Description = "Посмотреть как оно будет выглядеть", DueDate = DateTime.Now.AddDays(5), Priority = Priority.High, Status = Status.Active }
-        };
+        _filePath = AppConfiguration.GetValue("FilePath") ?? string.Empty;
 
         Statuses = new(EnumHelper
             .GetAllValuesAndDescriptions(typeof(Status))
             .Prepend(new() { Value = null, Description = "Все"}));
 
+        _tasks = new();
         TasksView = CollectionViewSource.GetDefaultView(_tasks);
         TasksView.Filter = q => Filter((BusinessTask)q);
 
@@ -80,19 +79,29 @@ public class TaskManagerVM : ViewModel
         CreateCommand = new RelayCommand(OnCreateCommand, _ => true);
         UpdateCommand = new RelayCommand(OnUpdateCommand, _ => true);
         DeleteCommand = new RelayCommand(OnDeleteCommand, _ => true);
+
+        LoadCommand = new RelayCommand(OnLoadCommand, _ => true);
+        SaveCommand = new RelayCommand(OnSaveCommand, _ => _tasks?.Any() == true);
+    }
+
+    private async Task ShowDialog(ViewModel vm, Action onConfirm)
+    {
+        var result = await DialogHost.Show(vm, DialogHostId);
+
+        if (result?.ToString() == "Confirm")
+        {
+            onConfirm?.Invoke();
+            SaveCommand.RaiseCanExecuteChanged();
+            TasksView?.Refresh();
+        }
     }
 
     private async void OnCreateCommand(object? _)
     {
         var newTask = new BusinessTask();
         var vm = new TaskEditDialogVM() { BusinessTask = newTask };
-        var result = await DialogHost.Show(vm, DialogHostId);
-
-        if (result?.ToString() == "Confirm")
-        {
-            _tasks.Add(newTask);
-            TasksView?.Refresh();
-        }
+     
+        await ShowDialog(vm, () => _tasks.Add(newTask));   
     }
 
     private async void OnUpdateCommand(object? taskObj)
@@ -112,18 +121,14 @@ public class TaskManagerVM : ViewModel
         };
 
         var vm = new TaskEditDialogVM() { BusinessTask = newTask };
-        var result = await DialogHost.Show(vm, DialogHostId);
-
-        if (result?.ToString() == "Confirm")
+        await ShowDialog(vm, () =>
         {
             task.Title = newTask.Title;
             task.Description = newTask.Description;
             task.Status = newTask.Status;
             task.Priority = newTask.Priority;
             task.DueDate = newTask.DueDate;
-
-            TasksView?.Refresh();
-        }
+        });
     }
 
     private async void OnDeleteCommand(object? taskObj)
@@ -132,13 +137,46 @@ public class TaskManagerVM : ViewModel
             return;
 
         var vm = new ConfirmDialogVM() { Message = "Вы уверены, что хотите удалить эту задачу?" };
-        var result = await DialogHost.Show(vm, DialogHostId);
+        
+        await ShowDialog(vm, () => _tasks.Remove(task));
+    }
 
-        if (result?.ToString() == "Confirm")
+    private async void OnLoadCommand(object? _)
+    {
+        if (string.IsNullOrWhiteSpace(_filePath))
+            throw new ArgumentNullException(nameof(_filePath));
+
+        if (!File.Exists(_filePath))
         {
-            _tasks.Remove(task);
-            TasksView?.Refresh();
+            File.Create(_filePath);
+            await File.WriteAllTextAsync(_filePath, "[]");
         }
+
+        var tasks = Enumerable.Empty<BusinessTask>();
+
+        try
+        {
+            using var streamReader = new StreamReader(_filePath);
+            tasks = await JsonSerializer.DeserializeAsync<IEnumerable<BusinessTask>>(streamReader.BaseStream);
+        }
+        catch (JsonException ex)
+        {
+            await DialogHost.Show(ex.Message, DialogHostId);
+        }
+
+        foreach (var task in tasks)
+        {
+            _tasks.Add(task);
+        }
+
+        SaveCommand.RaiseCanExecuteChanged();
+        TasksView?.Refresh();
+    }
+
+    private async void OnSaveCommand(object? _)
+    {
+        using var streamWriter = new StreamWriter(_filePath);
+        await JsonSerializer.SerializeAsync(streamWriter.BaseStream, _tasks, new JsonSerializerOptions() { WriteIndented = true });
     }
 
     private void UpdateSortDescription()

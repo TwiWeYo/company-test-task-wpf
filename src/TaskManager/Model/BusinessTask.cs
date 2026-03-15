@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace TaskManager.Model;
 
@@ -25,6 +26,7 @@ public class BusinessTask : INotifyPropertyChanged, IDataErrorInfo
 
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
+    [JsonIgnore]
     public string Error { get; }
 
     public string this[string columnName]
