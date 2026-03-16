@@ -21,6 +21,8 @@ public class TaskManagerVM : ViewModel
 
     public ObservableCollection<ValueDescription> Statuses { get; }
 
+    public SnackbarMessageQueue MessageQueue { get; } = new();
+
     private string _searchText;
     public string SearchText
     {
@@ -94,6 +96,8 @@ public class TaskManagerVM : ViewModel
         }
     }
 
+    private void ShowSnackbar(string message) => MessageQueue.Enqueue(message, "Закрыть", null);
+
     private async void OnCreateCommand(object? _)
     {
         var newTask = new BusinessTask();
@@ -141,16 +145,15 @@ public class TaskManagerVM : ViewModel
 
     private async void OnLoadCommand(object? _)
     {
-        //TODO - создать отдельный диалог для ошибок или переписать существующий
         if (string.IsNullOrWhiteSpace(_filePath))
         {
-            await DialogHost.Show(new ConfirmDialogVM() { Message = "Путь файла не указан" }, DialogHostId);
+            ShowSnackbar("Путь файла не указан");
             return;
         }
 
         if (!File.Exists(_filePath))
         {
-            await DialogHost.Show(new ConfirmDialogVM() { Message = $"Файл {_filePath} не существует" }, DialogHostId);
+            ShowSnackbar($"Файл {_filePath} не существует");
             return;
         }
 
@@ -163,7 +166,7 @@ public class TaskManagerVM : ViewModel
         }
         catch (JsonException ex)
         {
-            await DialogHost.Show(new ConfirmDialogVM() { Message = $"Ошибка чтения JSON \n {ex.Message}" }, DialogHostId);
+            ShowSnackbar($"Ошибка чтения JSON \n {ex.Message}");
             return;
         }
 
@@ -182,10 +185,11 @@ public class TaskManagerVM : ViewModel
         {
             using var streamWriter = new StreamWriter(_filePath);
             await JsonSerializer.SerializeAsync(streamWriter.BaseStream, _tasks, new JsonSerializerOptions() { WriteIndented = true });
+            ShowSnackbar($"Сохранено в файл {_filePath}");
         }
         catch (Exception ex)
         {
-            await DialogHost.Show(new ConfirmDialogVM() { Message = $"Ошибка сохранения файла: \n{ex.Message}" }, DialogHostId);
+            ShowSnackbar($"Ошибка сохранения файла: \n{ex.Message}");
         }
     }
 
