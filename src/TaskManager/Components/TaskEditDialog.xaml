@@ -13,12 +13,14 @@
         <TextBlock Text="Описание" />
         <TextBox Text="{Binding Path=Description, Mode=TwoWay}" Margin="5" />
         <ComboBox md:HintAssist.Hint="Статус" Margin="5 10"
+          Style="{DynamicResource MaterialDesignFloatingHintComboBox}"
           ItemsSource="{Binding Path=Status, Converter={utils:EnumToCollectionConverter}, Mode=OneTime}"
           SelectedValuePath="Value"
           DisplayMemberPath="Description"
           SelectedValue="{Binding Path=Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
         </ComboBox>
         <ComboBox md:HintAssist.Hint="Приоритет" Margin="5 10"
+          Style="{DynamicResource MaterialDesignFloatingHintComboBox}"
           ItemsSource="{Binding Path=Priority, Converter={utils:EnumToCollectionConverter}, Mode=OneTime}"
           SelectedValuePath="Value"
           DisplayMemberPath="Description"

@@ -36,7 +36,7 @@ public class BusinessTask : INotifyPropertyChanged, IDataErrorInfo
             string? result = columnName switch
             {
                 "Title" when string.IsNullOrWhiteSpace(Title) => $"Поле {nameof(Title)} не может быть пустым",
-                "DueDate" when DueDate.HasValue && DueDate.Value < DateTime.UtcNow => $"{nameof(DueDate)} не может быть в прошлом",
+                "DueDate" when DueDate.HasValue && DueDate.Value.Date < DateTime.Today => $"{nameof(DueDate)} не может быть в прошлом",
                 _ => null
             };
 
