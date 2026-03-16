@@ -145,11 +145,13 @@ public class TaskManagerVM : ViewModel
         if (string.IsNullOrWhiteSpace(_filePath))
         {
             await DialogHost.Show(new ConfirmDialogVM() { Message = "Путь файла не указан" }, DialogHostId);
+            return;
         }
 
         if (!File.Exists(_filePath))
         {
             await DialogHost.Show(new ConfirmDialogVM() { Message = $"Файл {_filePath} не существует" }, DialogHostId);
+            return;
         }
 
         var tasks = Enumerable.Empty<BusinessTask>();
@@ -162,6 +164,7 @@ public class TaskManagerVM : ViewModel
         catch (JsonException ex)
         {
             await DialogHost.Show(new ConfirmDialogVM() { Message = $"Ошибка чтения JSON \n {ex.Message}" }, DialogHostId);
+            return;
         }
 
         foreach (var task in tasks)
