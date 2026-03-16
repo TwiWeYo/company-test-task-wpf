@@ -141,13 +141,15 @@ public class TaskManagerVM : ViewModel
 
     private async void OnLoadCommand(object? _)
     {
+        //TODO - создать отдельный диалог для ошибок или переписать существующий
         if (string.IsNullOrWhiteSpace(_filePath))
-            throw new ArgumentNullException(nameof(_filePath));
+        {
+            await DialogHost.Show(new ConfirmDialogVM() { Message = "Путь файла не указан" }, DialogHostId);
+        }
 
         if (!File.Exists(_filePath))
         {
-            File.Create(_filePath);
-            await File.WriteAllTextAsync(_filePath, "[]");
+            await DialogHost.Show(new ConfirmDialogVM() { Message = $"Файл {_filePath} не существует" }, DialogHostId);
         }
 
         var tasks = Enumerable.Empty<BusinessTask>();
@@ -159,7 +161,7 @@ public class TaskManagerVM : ViewModel
         }
         catch (JsonException ex)
         {
-            await DialogHost.Show(ex.Message, DialogHostId);
+            await DialogHost.Show(new ConfirmDialogVM() { Message = $"Ошибка чтения JSON \n {ex.Message}" }, DialogHostId);
         }
 
         foreach (var task in tasks)
@@ -173,8 +175,15 @@ public class TaskManagerVM : ViewModel
 
     private async void OnSaveCommand(object? _)
     {
-        using var streamWriter = new StreamWriter(_filePath);
-        await JsonSerializer.SerializeAsync(streamWriter.BaseStream, _tasks, new JsonSerializerOptions() { WriteIndented = true });
+        try
+        {
+            using var streamWriter = new StreamWriter(_filePath);
+            await JsonSerializer.SerializeAsync(streamWriter.BaseStream, _tasks, new JsonSerializerOptions() { WriteIndented = true });
+        }
+        catch (Exception ex)
+        {
+            await DialogHost.Show(new ConfirmDialogVM() { Message = $"Ошибка сохранения файла: \n{ex.Message}" }, DialogHostId);
+        }
     }
 
     private void UpdateSortDescription()

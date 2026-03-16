@@ -8,8 +8,9 @@
              xmlns:sys="clr-namespace:System;assembly=System"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <TextBlock Margin="10 20" TextAlignment="Center" Text="{Binding Message}"
+    <StackPanel MaxWidth="800">
+        <TextBlock Margin="10 20" TextAlignment="Center" TextWrapping="Wrap"
+                   Text="{Binding Message}"
                    d:Text="Вы уверены?"/>
         <UniformGrid Columns="2">
             <Button Content="Подтвердить" Command="{x:Static md:DialogHost.CloseDialogCommand}" CommandParameter="Confirm" Margin="5"/>
